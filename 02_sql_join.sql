@@ -78,18 +78,37 @@ where CountryCode = (select CountryCode FROM world.city WHERE population = 12219
 and population != 122199;
 
 # 17: What are the city names in the country where Luanda is capital?
-select city.name, Capital
-from world.city
-JOIN world.country  
-where Code = (select Code from world.country where Capital = "Luanda");
+SELECT CountryCode, city.Name, Population 
+FROM world.city
+WHERE CountryCode = (
+	SELECT Code 
+    FROM world.country 
+    WHERE Capital = (
+		SELECT Id 
+        FROM world.city 
+        WHERE Name = 'Luanda'
+	)
+);
 
 #
 #
 # 18: What are the names of the capital cities in countries in the same region as the city named Yaren
-SELECT capital, Region
-FROM world.country
-JOIN region  ON world.country = region
-WHERE region = (SELECT region FROM world.country WHERE city.name = 'Yaren');
+SELECT city.CountryCode, city.Name
+FROM world.city
+WHERE city.ID IN (
+	SELECT country.Capital 
+	FROM world.country 
+	WHERE country.Region = (
+		SELECT country.Region 
+        FROM world.country 
+        WHERE country.Code = (
+			SELECT city.CountryCode 
+            FROM world.city 
+            WHERE city.Name = 'Yaren'
+		)
+	)
+)
+ORDER BY city.name;
 
 #
 # 19: What unique languages are spoken in the countries in the same region as the city named Riga
